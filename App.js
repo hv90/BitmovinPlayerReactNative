@@ -9,6 +9,8 @@
 import React, {useEffect} from 'react';
 import type {Node} from 'react';
 import {
+  AppRegistry,
+  Button,
   NativeModules,
   SafeAreaView,
   ScrollView,
@@ -60,8 +62,10 @@ const App: () => Node = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const BitmovinPlayer = NativeModules.BitmovinPlayerModule;
+
   useEffect(() => {
-    console.log({NativeModules});
+    console.log(BitmovinPlayer);
   }, []);
 
   return (
@@ -71,6 +75,10 @@ const App: () => Node = () => {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
+        <Button
+          title="Start Player"
+          onPress={() => BitmovinPlayer.startPlayer()}
+        />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -113,5 +121,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+
+AppRegistry.registerComponent(
+  'RNBitmovinPlayer', // Name of the component for the Android side to pick up
+  () => App,
+);
 
 export default App;
