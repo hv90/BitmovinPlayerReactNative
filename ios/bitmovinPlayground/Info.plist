@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>bitmovinPlayground</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+<<<<<<< HEAD
+	<key>UIAppFonts</key>
+	<array>
+		<string>AlternateGothicATF-Bold.otf</string>
+		<string>AlternateGothicATF-Book.otf</string>
+		<string>AlternateGothicATF-Medium.otf</string>
+		<string>AlternateGothicATF.otf</string>
+		<string>FuturaStdBold.ttf</string>
+		<string>FuturaStdBook.ttf</string>
+		<string>FuturaStdExtraBold.ttf</string>
+		<string>FuturaStdHeavy.ttf</string>
+		<string>FuturaStdLight.ttf</string>
+		<string>FuturaStdMedium.ttf</string>
+		<string>Oswald-VariableFont_wght.ttf</string>
+		<string>Rubik-Italic-VariableFont_wght.ttf</string>
+		<string>Rubik-VariableFont_wght.ttf</string>
+	</array>
+=======
+>>>>>>> ee97c627cdf04bcc80727b36d35a43563b7e36a9
+</dict>
+</plist>
