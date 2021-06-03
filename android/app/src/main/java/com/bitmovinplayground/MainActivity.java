@@ -1,36 +1,69 @@
 package com.bitmovinplayground;
 
-import android.app.Activity;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.View;
 
 import com.bitmovin.player.PlayerView;
+import com.bitmovin.player.api.Player;
+import com.bitmovin.player.api.source.SourceConfig;
 
-import com.facebook.react.ReactActivity;
+public class MainActivity extends AppCompatActivity {
+  private PlayerView playerView;
+  private Player player;
 
-public class MainActivity extends ReactActivity {
-  public Activity _activity;
-  public View _decorView;
-  public PlayerView _playerView;
-  public Toolbar _toolbar;
-
-  /**
-   * Returns the name of the main component registered from JavaScript. This is
-   * used to schedule rendering of the component.
-   */
   @Override
-  protected String getMainComponentName() {
-    return "bitmovinPlayground";
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    playerView = findViewById(R.id.playerView);
+    player = playerView.getPlayer();
+
+    // Instantiate a custom FullscreenHandler
+    CustomFullscreenHandler customFullscreenHandler = new CustomFullscreenHandler(this, playerView, toolbar);
+    // Set the FullscreenHandler to the PlayerView
+    playerView.setFullscreenHandler(customFullscreenHandler);
+
+    initializePlayer();
   }
 
-  /*
-   * public MainActivity(Activity activity, PlayerView playerView, Toolbar
-   * toolbar) { this._activity = activity; this._playerView = playerView;
-   * this._toolbar = toolbar; this._decorView =
-   * activity.getWindow().getDecorView();
-   * RNBitmovinPlayerModule.getThePlayerView(this._playerView); }
-   * 
-   * public Activity getTheActivity() { return this._activity; }
-   */
+  @Override
+  protected void onStart() {
+    playerView.onStart();
+    super.onStart();
+  }
 
+  @Override
+  protected void onResume() {
+    super.onResume();
+    playerView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    playerView.onPause();
+    super.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    playerView.onStop();
+    super.onStop();
+  }
+
+  @Override
+  protected void onDestroy() {
+    playerView.onDestroy();
+    super.onDestroy();
+  }
+
+  protected void initializePlayer() {
+    // Load a new source
+    player.load(SourceConfig.fromUrl("https://bitdash-a.akamaihd.net/content/sintel/sintel.mpd"));
+  }
 }
