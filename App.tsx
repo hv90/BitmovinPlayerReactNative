@@ -16,14 +16,6 @@ const App = () => {
       <View style={{flex: 1}}>
         <BitmovinPlayer style={{flex: 1}} configuration={config} />
       </View>
-      {/* <Button
-        title="Fullscreen"
-        onPress={() => {
-          setIsFullscreen(current => !current);
-          BitmovinPlayer.enterFullscreen();
-          // playerview java module, instantiate it from getActivity or reactContext
-        }}
-      /> */}
     </SafeAreaView>
   );
 };

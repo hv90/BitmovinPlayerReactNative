@@ -181,26 +181,29 @@ class BitmovinPlayer extends React.Component {
     const {maxHeight} = this.state;
 
     return (
-      <RNBitmovinPlayer
-        {...this.props}
-        ref={this._setRef}
-        onReady={this._onReady}
-        configuration={{
-          ...DEFAULT_CONFIGURATION,
-          ...configuration,
-        }}
-        style={[
-          maxHeight
-            ? {
-                maxHeight,
-              }
-            : null,
-          {
-            backgroundColor: 'black',
-          },
-          style,
-        ]}
-      />
+      <>
+        <RNBitmovinPlayer
+          {...this.props}
+          ref={this._setRef}
+          onReady={this._onReady}
+          configuration={{
+            ...DEFAULT_CONFIGURATION,
+            ...configuration,
+          }}
+          style={[
+            maxHeight
+              ? {
+                  maxHeight,
+                }
+              : null,
+            {
+              backgroundColor: 'black',
+            },
+            style,
+          ]}
+        />
+        <Button title="fullscreen" onPress={() => this.enterFullscreen()} />
+      </>
     );
   }
 }

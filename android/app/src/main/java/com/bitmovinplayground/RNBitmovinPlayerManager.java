@@ -102,7 +102,8 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
         _decorView = _reactContext.getCurrentActivity().getWindow().getDecorView();
         // .findViewById(R.id.bitmovinPlayerView);
 
-        _player = _playerView.getPlayer();
+        _player = _playerView.getPlayer(); // .config = (new PlayerConfig());
+        // _playerView.setPlayer(_player);
         setListeners();
 
         return _playerView;

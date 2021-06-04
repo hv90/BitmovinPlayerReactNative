@@ -3,6 +3,9 @@ package com.bitmovinplayground;
 import android.view.View;
 
 import com.bitmovin.player.PlayerView;
+
+import com.bitmovinplayground.R;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -88,7 +91,7 @@ public class RNBitmovinPlayerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void enterFullscreen(int tag) {
-        View playerView = getCurrentActivity().findViewById(tag);
+        View playerView = getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
 
         if (playerView instanceof PlayerView) {
 
@@ -101,7 +104,7 @@ public class RNBitmovinPlayerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void exitFullscreen(int tag) {
-        View playerView = getCurrentActivity().findViewById(tag);
+        View playerView = getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
 
         if (playerView instanceof PlayerView) {
             ((PlayerView) playerView).exitFullscreen();
