@@ -91,11 +91,11 @@ public class RNBitmovinPlayerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void enterFullscreen(int tag) {
-        View playerView = getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
+        View playerView = getCurrentActivity().findViewById(tag);
 
         if (playerView instanceof PlayerView) {
 
-            ((PlayerView) playerView).enterFullscreen();
+            ((PlayerView) playerView).enterPictureInPicture();
         } else {
             throw new ClassCastException(
                     String.format("Cannot enterFullscreen: view with tag #%d is not a RNBitmovinPlayer", tag));
@@ -104,7 +104,7 @@ public class RNBitmovinPlayerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void exitFullscreen(int tag) {
-        View playerView = getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
+        View playerView = getCurrentActivity().findViewById(tag);
 
         if (playerView instanceof PlayerView) {
             ((PlayerView) playerView).exitFullscreen();

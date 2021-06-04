@@ -202,7 +202,12 @@ class BitmovinPlayer extends React.Component {
             style,
           ]}
         />
-        <Button title="fullscreen" onPress={() => this.enterFullscreen()} />
+        <Button
+          title="fullscreen"
+          onPress={() => {
+            this.enterFullscreen();
+          }}
+        />
       </>
     );
   }

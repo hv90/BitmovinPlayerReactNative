@@ -96,8 +96,8 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
                 .put("onSeeked", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onSeeked")))
                 .put("onFullscreenEnter",
                         MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onFullscreenEnter")))
-                .put("_onFullscreenExit",
-                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "_onFullscreenExit")))
+                .put("onFullscreenExit",
+                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onFullscreenExit")))
                 .build();
     }
 
@@ -107,12 +107,17 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
 
         isFullscreen = false;
 
+        _playerView = new PlayerView(context); // (PlayerView)
+                                               // _reactContext.getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
+        _player = _playerView.getPlayer();
+        _decorView = _reactContext.getCurrentActivity().getWindow().getDecorView();
+
         // .findViewById(R.id.bitmovinPlayerView);
 
         // .config = (new PlayerConfig());
         // _playerView.setPlayer(_player);
 
-        return new PlayerView(context);
+        return _playerView;
     }
 
     @Override
@@ -140,10 +145,6 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
          * if (_playerView.getParent() != null) ((ViewGroup)
          * _playerView.getParent()).removeView(_playerView);
          */
-        _reactContext.getCurrentActivity().setContentView(R.layout.activity_main);
-        _playerView = (PlayerView) _reactContext.getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
-        _player = _playerView.getPlayer();
-        _decorView = _reactContext.getCurrentActivity().getWindow().getDecorView();
 
         if (config.hasKey("source")) {
             sourceMap = config.getMap("source");
