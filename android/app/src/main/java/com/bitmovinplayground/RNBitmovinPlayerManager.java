@@ -1,6 +1,13 @@
 package com.bitmovinplayground;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.bitmovin.player.api.event.Event;
 import com.bitmovin.player.api.event.PlayerEvent;
@@ -24,8 +31,8 @@ import com.bitmovin.player.api.source.SourceConfig;
 import com.bitmovin.player.api.Player;
 import com.bitmovin.player.api.PlayerConfig;
 import com.bitmovin.player.api.ui.FullscreenHandler;
-import com.bitmovin.player.ui.FullscreenUtil;
 import com.bitmovin.player.api.ui.StyleConfig;
+import com.bitmovin.player.ui.FullscreenUtil;
 import com.bitmovin.player.PlayerView;
 
 import com.bitmovinplayground.R;
@@ -97,16 +104,15 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
     @Override
     public PlayerView createViewInstance(ThemedReactContext context) {
         _reactContext = context;
-        _playerView = new PlayerView(context);
+
         isFullscreen = false;
-        _decorView = _reactContext.getCurrentActivity().getWindow().getDecorView();
+
         // .findViewById(R.id.bitmovinPlayerView);
 
-        _player = _playerView.getPlayer(); // .config = (new PlayerConfig());
+        // .config = (new PlayerConfig());
         // _playerView.setPlayer(_player);
-        setListeners();
 
-        return _playerView;
+        return new PlayerView(context);
     }
 
     @Override
@@ -129,6 +135,15 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
         ReadableMap sourceMap = null;
         ReadableMap posterMap = null;
         ReadableMap styleMap = null;
+
+        /*
+         * if (_playerView.getParent() != null) ((ViewGroup)
+         * _playerView.getParent()).removeView(_playerView);
+         */
+        _reactContext.getCurrentActivity().setContentView(R.layout.activity_main);
+        _playerView = (PlayerView) _reactContext.getCurrentActivity().findViewById(R.id.bitmovinPlayerView);
+        _player = _playerView.getPlayer();
+        _decorView = _reactContext.getCurrentActivity().getWindow().getDecorView();
 
         if (config.hasKey("source")) {
             sourceMap = config.getMap("source");
@@ -191,6 +206,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
             _player.load(_srcConfig);
             // setListeners();
         }
+        setListeners();
     }
 
     @Override
@@ -222,6 +238,8 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
 
         });
 
+        doLayoutChanges(isFullscreen);
+
         // ((PlayerView) _decorView).enterFullscreen();
     }
 
@@ -234,6 +252,8 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
             _decorView.setSystemUiVisibility(uiParams);
 
         });
+
+        doLayoutChanges(isFullscreen);
 
         // ((PlayerView) _decorView).exitFullscreen();
     }
@@ -421,5 +441,57 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
                         map);
             }
         });
+    }
+
+    private void doLayoutChanges(final boolean fullscreen) {
+        Looper mainLooper = Looper.getMainLooper();
+        boolean isAlreadyMainLooper = Looper.myLooper() == mainLooper;
+
+        UpdateLayoutRunnable updateLayoutRunnable = new UpdateLayoutRunnable(
+                (AppCompatActivity) _reactContext.getCurrentActivity(), fullscreen);
+
+        if (isAlreadyMainLooper) {
+            updateLayoutRunnable.run();
+        } else {
+            Handler handler = new Handler(mainLooper);
+            handler.post(updateLayoutRunnable);
+        }
+    }
+
+    private class UpdateLayoutRunnable implements Runnable {
+        private AppCompatActivity _activity;
+        private boolean fullscreen;
+        public Toolbar _toolbar;
+
+        private UpdateLayoutRunnable(AppCompatActivity activity, boolean fullscreen) {
+            _activity = activity;
+            this.fullscreen = fullscreen;
+            _toolbar = _activity.findViewById(R.id.toolbar);
+            _activity.setSupportActionBar(_toolbar);
+        }
+
+        @Override
+        @SuppressLint("RestrictedApi")
+        public void run() {
+            if (_toolbar != null) {
+                if (this.fullscreen) {
+                    _toolbar.setVisibility(View.GONE);
+                } else {
+                    _toolbar.setVisibility(View.VISIBLE);
+                }
+            }
+
+            if (_playerView.getParent() instanceof ViewGroup) {
+                ViewGroup parentView = (ViewGroup) _playerView.getParent();
+
+                for (int i = 0; i < parentView.getChildCount(); i++) {
+                    View child = parentView.getChildAt(i);
+
+                    if (child != _playerView) {
+                        child.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
+                    }
+                }
+            }
+        }
     }
 }
