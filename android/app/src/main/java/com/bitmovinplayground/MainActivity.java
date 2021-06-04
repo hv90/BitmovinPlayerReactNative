@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    playerView = findViewById(R.id.playerView);
+    playerView = findViewById(R.id.bitmovinPlayerView);
     player = playerView.getPlayer();
 
     // Instantiate a custom FullscreenHandler
