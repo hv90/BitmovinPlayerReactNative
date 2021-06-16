@@ -2,12 +2,14 @@ package com.bitmovinplayground;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bitmovin.player.api.event.Event;
 import com.bitmovin.player.api.event.PlayerEvent;
@@ -18,6 +20,8 @@ import com.bitmovin.player.api.event.PlayerEvent.Muted;
 import com.bitmovin.player.api.event.PlayerEvent.Paused;
 import com.bitmovin.player.api.event.PlayerEvent.Play;
 import com.bitmovin.player.api.event.PlayerEvent.PlaybackFinished;
+import com.bitmovin.player.api.event.PlayerEvent.PictureInPictureEnter;
+import com.bitmovin.player.api.event.PlayerEvent.PictureInPictureExit;
 import com.bitmovin.player.api.event.PlayerEvent.Ready;
 import com.bitmovin.player.api.event.PlayerEvent.RenderFirstFrame;
 import com.bitmovin.player.api.event.PlayerEvent.Seek;
@@ -34,6 +38,8 @@ import com.bitmovin.player.api.ui.FullscreenHandler;
 import com.bitmovin.player.api.ui.StyleConfig;
 import com.bitmovin.player.ui.FullscreenUtil;
 import com.bitmovin.player.PlayerView;
+import com.bitmovin.player.ui.DefaultPictureInPictureHandler;
+import com.bitmovin.player.ui.FullscreenUtil;
 
 import com.bitmovinplayground.R;
 
@@ -62,6 +68,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
     private Player _player;
     private View _decorView;
     private boolean isFullscreen;
+    private boolean playerShouldPause = true;
     private ThemedReactContext _reactContext;
     private ReactApplicationContext mCallerContext;
 
@@ -112,22 +119,38 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
         _player = _playerView.getPlayer();
         _decorView = _reactContext.getCurrentActivity().getWindow().getDecorView();
 
+        DefaultPictureInPictureHandler pictureInPictureHandler = new DefaultPictureInPictureHandler(
+                _reactContext.getCurrentActivity(), _player);
+        _playerView.setPictureInPictureHandler(pictureInPictureHandler);
+
         // .findViewById(R.id.bitmovinPlayerView);
 
         // .config = (new PlayerConfig());
         // _playerView.setPlayer(_player);
 
+        // setListeners();
+
         return _playerView;
+    }
+
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        // Hiding the ActionBar
+        if (isInPictureInPictureMode) {
+            _reactContext.getCurrentActivity().getActionBar().hide();
+        } else {
+            _reactContext.getCurrentActivity().getActionBar().show();
+        }
+        _playerView.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
     }
 
     @Override
     public void onDropViewInstance(PlayerView view) {
         _playerView.onDestroy();
+        Toast.makeText(_reactContext, "hello", Toast.LENGTH_LONG).show();
+        // _playerView = view;
 
-        super.onDropViewInstance(view);
-
-        _player = null;
-        _playerView = null;
+        // _player = null;
+        // _playerView = null;
     }
 
     @ReactProp(name = "configuration")
@@ -217,14 +240,30 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
 
     @Override
     public void onResume() {
+        // Add the PictureInPictureEnterListener to the PlayerView
+        _playerView.on(PictureInPictureEnter.class, pipEnterListener);
+
+        _playerView.onResume();
     }
 
     @Override
     public void onPause() {
+        if (playerShouldPause) {
+            _playerView.onPause();
+        }
+        playerShouldPause = true;
+
+        _playerView.off(PictureInPictureEnter.class, pipEnterListener);
+
     }
 
     @Override
     public void onDestroy() {
+        _playerView.onDestroy();
+    }
+
+    public void onStart() {
+        _playerView.onStart();
     }
 
     @Override
@@ -442,6 +481,200 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
                         map);
             }
         });
+
+        _player.<PictureInPictureEnter>on(PictureInPictureEnter.class, new EventListener<PictureInPictureEnter>() {
+
+            @Override
+            public void onEvent(PictureInPictureEnter event) {
+                playerShouldPause = false;
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(),
+                        "onPictureInPictureEnter", map);
+            }
+        });
+    }
+
+    private void unsetListeners() {
+        _player.<Ready>off(Ready.class, new EventListener<Ready>() {
+            @Override
+            public void onEvent(Ready event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onReady", map);
+            }
+        });
+
+        _player.<Play>off(Play.class, new EventListener<Play>() {
+            @Override
+            public void onEvent(Play event) {
+                WritableMap map = Arguments.createMap();
+
+                map.putDouble("time", event.getTime());
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onPlay", map);
+            }
+        });
+
+        _player.<Paused>off(Paused.class, new EventListener<Paused>() {
+
+            @Override
+            public void onEvent(Paused event) {
+                WritableMap map = Arguments.createMap();
+
+                map.putDouble("time", event.getTime());
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onPaused", map);
+            }
+        });
+
+        _player.<TimeChanged>off(TimeChanged.class, new EventListener<TimeChanged>() {
+
+            @Override
+            public void onEvent(TimeChanged event) {
+                WritableMap map = Arguments.createMap();
+
+                map.putDouble("time", event.getTime());
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onTimeChanged",
+                        map);
+            }
+        });
+
+        _player.<StallStarted>off(StallStarted.class, new EventListener<StallStarted>() {
+
+            @Override
+            public void onEvent(StallStarted event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onStallStarted",
+                        map);
+            }
+        });
+
+        _player.<StallEnded>off(StallEnded.class, new EventListener<StallEnded>() {
+
+            @Override
+            public void onEvent(StallEnded event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onStallEnded", map);
+            }
+        });
+
+        _player.<PlaybackFinished>off(PlaybackFinished.class, new EventListener<PlaybackFinished>() {
+            @Override
+            public void onEvent(PlaybackFinished event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onPlaybackFinished",
+                        map);
+            }
+        });
+
+        _player.<RenderFirstFrame>off(RenderFirstFrame.class, new EventListener<RenderFirstFrame>() {
+
+            @Override
+            public void onEvent(RenderFirstFrame event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onRenderFirstFrame",
+                        map);
+            }
+        });
+
+        _player.<Error>off(Error.class, new EventListener<Error>() {
+
+            @Override
+            public void onEvent(Error event) {
+                WritableMap map = Arguments.createMap();
+                WritableMap errorMap = Arguments.createMap();
+
+                errorMap.putInt("code", event.getCode().getValue());
+                errorMap.putString("message", event.getMessage());
+
+                map.putMap("error", errorMap);
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onError", map);
+            }
+        });
+
+        _player.<Muted>off(Muted.class, new EventListener<Muted>() {
+
+            @Override
+            public void onEvent(Muted event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onMuted", map);
+            }
+        });
+
+        _player.<Unmuted>off(Unmuted.class, new EventListener<Unmuted>() {
+
+            @Override
+            public void onEvent(Unmuted event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onUnmuted", map);
+            }
+        });
+
+        _player.<Seek>off(Seek.class, new EventListener<Seek>() {
+
+            @Override
+            public void onEvent(Seek event) {
+                WritableMap map = Arguments.createMap();
+
+                map.putDouble("seekTarget", event.getTo().getTime());
+                map.putDouble("position", event.getFrom().getTime());
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onSeek", map);
+            }
+        });
+
+        _player.<Seeked>off(Seeked.class, new EventListener<Seeked>() {
+
+            @Override
+            public void onEvent(Seeked event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onSeeked", map);
+            }
+        });
+
+        _player.<FullscreenEnter>off(FullscreenEnter.class, new EventListener<FullscreenEnter>() {
+
+            @Override
+            public void onEvent(FullscreenEnter event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onFullscreenEnter",
+                        map);
+            }
+        });
+
+        _player.<FullscreenExit>off(FullscreenExit.class, new EventListener<FullscreenExit>() {
+
+            @Override
+            public void onEvent(FullscreenExit event) {
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(), "onFullscreenExit",
+                        map);
+            }
+        });
+
+        _player.<PictureInPictureEnter>off(PictureInPictureEnter.class, new EventListener<PictureInPictureEnter>() {
+
+            @Override
+            public void onEvent(PictureInPictureEnter event) {
+                playerShouldPause = false;
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(),
+                        "onPictureInPictureEnter", map);
+            }
+        });
     }
 
     private void doLayoutChanges(final boolean fullscreen) {
@@ -495,4 +728,13 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
             }
         }
     }
+
+    private EventListener<PlayerEvent.PictureInPictureEnter> pipEnterListener = new EventListener<PlayerEvent.PictureInPictureEnter>() {
+        @Override
+        public void onEvent(PlayerEvent.PictureInPictureEnter pictureInPictureEnter) {
+            // Android fires an onPause on the Activity when entering PiP mode.
+            // However, we do not want the PlayerView to act on
+            playerShouldPause = false;
+        }
+    };
 }

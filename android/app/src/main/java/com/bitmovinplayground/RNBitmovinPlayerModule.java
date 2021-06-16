@@ -95,7 +95,7 @@ public class RNBitmovinPlayerModule extends ReactContextBaseJavaModule {
 
         if (playerView instanceof PlayerView) {
 
-            ((PlayerView) playerView).enterPictureInPicture();
+            ((PlayerView) playerView).enterFullscreen();
         } else {
             throw new ClassCastException(
                     String.format("Cannot enterFullscreen: view with tag #%d is not a RNBitmovinPlayer", tag));
