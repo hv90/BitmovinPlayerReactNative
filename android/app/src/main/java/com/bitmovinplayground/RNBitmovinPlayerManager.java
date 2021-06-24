@@ -105,6 +105,10 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
                         MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onFullscreenEnter")))
                 .put("onFullscreenExit",
                         MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onFullscreenExit")))
+                .put("onPictureInPictureEnter",
+                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onPictureInPictureEnter")))
+                .put("onPictureInPictureExit",
+                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onPictureInPictureExit")))
                 .build();
     }
 
@@ -133,20 +137,23 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
         return _playerView;
     }
 
-    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-        // Hiding the ActionBar
-        if (isInPictureInPictureMode) {
-            _reactContext.getCurrentActivity().getActionBar().hide();
-        } else {
-            _reactContext.getCurrentActivity().getActionBar().show();
-        }
-        _playerView.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
-    }
+    /*
+     * public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode,
+     * Configuration newConfig) { // Hiding the ActionBar if
+     * (isInPictureInPictureMode) {
+     * _reactContext.getCurrentActivity().getActionBar().hide(); } else {
+     * _reactContext.getCurrentActivity().getActionBar().show(); }
+     * _playerView.onPictureInPictureModeChanged(isInPictureInPictureMode,
+     * newConfig); }
+     */
 
     @Override
     public void onDropViewInstance(PlayerView view) {
-        _playerView.onDestroy();
-        Toast.makeText(_reactContext, "hello", Toast.LENGTH_LONG).show();
+        // _playerView.onDestroy();
+        // Toast.makeText(_reactContext, "hello", Toast.LENGTH_LONG).show();
+        // unsetListeners();
+        // view.invalidate();
+        // createViewInstance(_reactContext);
         // _playerView = view;
 
         // _player = null;
@@ -491,6 +498,18 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
 
                 _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(),
                         "onPictureInPictureEnter", map);
+            }
+        });
+
+        _player.<PictureInPictureExit>on(PictureInPictureExit.class, new EventListener<PictureInPictureExit>() {
+
+            @Override
+            public void onEvent(PictureInPictureExit event) {
+                playerShouldPause = false;
+                WritableMap map = Arguments.createMap();
+
+                _reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(_playerView.getId(),
+                        "onPictureInPictureExit", map);
             }
         });
     }

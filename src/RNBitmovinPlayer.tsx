@@ -9,6 +9,8 @@ import {
   requireNativeComponent,
   Platform,
   Button,
+  View,
+  Dimensions,
 } from 'react-native';
 
 const RNBitmovinPlayerModule = NativeModules.RNBitmovinPlayer;
@@ -65,6 +67,8 @@ class BitmovinPlayer extends React.Component {
 
   state = {
     maxHeight: null,
+    windowHeight: null,
+    windowWidth: null,
   };
 
   _onReady = () => {
@@ -78,6 +82,8 @@ class BitmovinPlayer extends React.Component {
         this.setState(
           {
             maxHeight: h - 1,
+            windowHeight: Dimensions.get('window').height,
+            windowWidth: Dimensions.get('window').width,
           },
           () => {
             requestAnimationFrame(() => {
@@ -178,10 +184,15 @@ class BitmovinPlayer extends React.Component {
   render() {
     const {style, configuration} = this.props;
 
-    const {maxHeight} = this.state;
+    const {maxHeight, windowHeight, windowWidth} = this.state;
+
+    console.log(maxHeight, windowHeight, windowWidth);
 
     return (
-      <>
+      <View
+        style={{
+          height: windowHeight < windowWidth ? windowHeight : windowWidth,
+        }}>
         <RNBitmovinPlayer
           {...this.props}
           ref={this._setRef}
@@ -202,13 +213,7 @@ class BitmovinPlayer extends React.Component {
             style,
           ]}
         />
-        <Button
-          title="fullscreen"
-          onPress={() => {
-            this.enterFullscreen();
-          }}
-        />
-      </>
+      </View>
     );
   }
 }

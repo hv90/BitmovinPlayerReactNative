@@ -14,7 +14,7 @@ const App = () => {
   return (
     <SafeAreaView style={{flex: 0.5, width: '100%'}}>
       <View style={{flex: 1}}>
-        <BitmovinPlayer style={{flex: 1}} configuration={config} />
+        <BitmovinPlayer style={{flex: 1, height: 800}} configuration={config} />
       </View>
     </SafeAreaView>
   );
