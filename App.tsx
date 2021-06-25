@@ -9,12 +9,14 @@ const App = () => {
   console.log(NativeModules);
   const config = {
     source: {url: 'https://bitdash-a.akamaihd.net/content/sintel/sintel.mpd'},
-    style: {fullscreenIcon: true},
   };
   return (
     <SafeAreaView style={{flex: 0.5, width: '100%'}}>
       <View style={{flex: 1}}>
-        <BitmovinPlayer style={{flex: 1, height: 800}} configuration={config} />
+        <BitmovinPlayer
+          style={{flex: 1, height: '100%'}}
+          configuration={config}
+        />
       </View>
     </SafeAreaView>
   );

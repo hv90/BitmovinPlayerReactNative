@@ -107,8 +107,6 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
                         MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onFullscreenExit")))
                 .put("onPictureInPictureEnter",
                         MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onPictureInPictureEnter")))
-                .put("onPictureInPictureExit",
-                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onPictureInPictureExit")))
                 .build();
     }
 
@@ -139,7 +137,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
 
     /*
      * public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode,
-     * Configuration newConfig) { // Hiding the ActionBar if
+     * Configuration newConfig) { // Hiding the // ActionBar if
      * (isInPictureInPictureMode) {
      * _reactContext.getCurrentActivity().getActionBar().hide(); } else {
      * _reactContext.getCurrentActivity().getActionBar().show(); }
@@ -204,6 +202,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
             }
 
             if (styleMap != null) {
+                _styleConfig.setUiEnabled(false);
                 if (styleMap.hasKey("uiEnabled") && !styleMap.getBoolean("uiEnabled")) {
                     // configuration.getStyleConfiguration().setUiEnabled(false);
                     _styleConfig.setUiEnabled(false);
@@ -248,7 +247,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
     @Override
     public void onResume() {
         // Add the PictureInPictureEnterListener to the PlayerView
-        _playerView.on(PictureInPictureEnter.class, pipEnterListener);
+        // _playerView.on(PictureInPictureEnter.class, pipEnterListener);
 
         _playerView.onResume();
     }
@@ -260,7 +259,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
         }
         playerShouldPause = true;
 
-        _playerView.off(PictureInPictureEnter.class, pipEnterListener);
+        // _playerView.off(PictureInPictureEnter.class, pipEnterListener);
 
     }
 
@@ -512,6 +511,7 @@ public class RNBitmovinPlayerManager extends SimpleViewManager<PlayerView>
                         "onPictureInPictureExit", map);
             }
         });
+
     }
 
     private void unsetListeners() {

@@ -1,6 +1,7 @@
 package com.bitmovinplayground;
 
 import android.view.View;
+import android.widget.Toast;
 
 import com.bitmovin.player.PlayerView;
 
@@ -112,6 +113,21 @@ public class RNBitmovinPlayerModule extends ReactContextBaseJavaModule {
             throw new ClassCastException(
                     String.format("Cannot exitFullscreen: view with tag #%d is not a RNBitmovinPlayer", tag));
         }
+    }
+
+    @ReactMethod
+    public void enterPictureInPicture(int tag) {
+
+        try {
+            getCurrentActivity().enterPictureInPictureMode();
+        } catch (Exception exception) {
+            Toast.makeText(_reactContext, "oh shit", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @ReactMethod
+    public void exitPictureInPicture(int tag) {
+
     }
 
     @ReactMethod

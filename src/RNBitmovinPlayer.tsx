@@ -19,8 +19,8 @@ const EMPTY_FN = () => {};
 
 const DEFAULT_CONFIGURATION = {
   style: {
-    uiEnabled: true,
-    fullscreenIcon: true,
+    uiEnabled: false,
+    fullscreenIcon: false,
   },
 };
 
@@ -131,6 +131,10 @@ class BitmovinPlayer extends React.Component {
     RNBitmovinPlayerModule.exitFullscreen(findNodeHandle(this._player));
   };
 
+  enterPictureInPicture = () => {
+    RNBitmovinPlayerModule.enterPictureInPicture(findNodeHandle(this._player));
+  };
+
   getCurrentTime = () =>
     RNBitmovinPlayerModule.getCurrentTime(findNodeHandle(this._player));
 
@@ -191,7 +195,8 @@ class BitmovinPlayer extends React.Component {
     return (
       <View
         style={{
-          height: windowHeight < windowWidth ? windowHeight : windowWidth,
+          height:
+            '100%' /* windowHeight < windowWidth ? windowHeight : windowWidth, */,
         }}>
         <RNBitmovinPlayer
           {...this.props}
